@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "linked_list.h"
-
+#include <assert.h>
 
 Node* list(){
     // create a 'sentinel node'.
@@ -10,6 +10,21 @@ Node* list(){
     sentinel->next = NULL;
     sentinel->item = '\0';
     return sentinel;
+}
+
+Node* peak(Node* sentinel, size_t idx){
+    Node* node = sentinel;
+
+    // compare to idx + 1, since we want our peak to be zero-indexed
+    // and we have a sentinel node
+    for (size_t i=0; i != idx+1; i++){
+        if (node->next == NULL){
+            // return the sentinel node as there are fewer than idx elements in the list
+            return sentinel;
+        }
+        node = node->next;
+    }
+    return node;
 }
 
 void free_list(Node* sentinel){
@@ -24,46 +39,55 @@ void free_list(Node* sentinel){
 
 void add(Node* sentinel, char item){
     // instantiate a new node
-    Node* new_node_ptr = (Node*)malloc(NODE_SIZE);
-    new_node_ptr->item = item;
-    
+    Node* new_node = (Node*)malloc(NODE_SIZE);
+    new_node->item = item;
+
     // traverse each node
-    Node* current_node = sentinel;
     while (true){
-        if(current_node->next == NULL){
+        if(sentinel->next == NULL){
             // replace the last node with our new node.
-            current_node->next = new_node_ptr;
+            sentinel->next = new_node;
             break;
         } else {
             // point to the next node
-            current_node = current_node->next;
+            sentinel = sentinel->next;
         }
     }
 }
 
 bool del(Node* sentinel, size_t idx){
-    Node* prior_node_ptr = sentinel;
+    // TODO find a way to leverage peak to simplify this
     for (size_t i=0; i != idx; i++){
-        if (!prior_node_ptr){
+        if (!sentinel){
             return false;
         }
-        prior_node_ptr = prior_node_ptr->next;
+        sentinel = sentinel->next;
     }
-
-    if (prior_node_ptr->next){
-        Node* index_node_ptr = prior_node_ptr->next;
+    if (sentinel->next){
+        Node* index_node_ptr = sentinel->next;
         if (index_node_ptr->next){
-            prior_node_ptr->next = index_node_ptr->next;
+            sentinel->next = index_node_ptr->next;
         } else {
             free(index_node_ptr);
-            prior_node_ptr->next = NULL;
+            sentinel->next = NULL;
         }
         return true;
     }
 }
 
-size_t len(const Node* sentinel){
-    const Node* current_node = sentinel;
+bool replace(Node* sentinel, size_t idx, char item){
+    Node* node = peak(sentinel, idx);
+    // check if the sentinel and the peaked node are the same
+    if (sentinel == node){
+        return false;
+    } else {
+        node->item = item;
+        return true;
+    }
+
+}
+size_t len(Node* sentinel){
+    Node* current_node = sentinel;
     size_t nodes = 0;
     while (true){
         // Check if we're at the final node.
@@ -75,62 +99,45 @@ size_t len(const Node* sentinel){
     }
 }
 
-char peak(const Node* sentinel, size_t idx){
-    Node* current_node = sentinel->next;
-
-    for (int i=0; i != idx; i++){
-        current_node = current_node->next;
-    }
-    return current_node->item;
-}
-
-void print(const Node* sentinel){
-    printf("###\n[");
+void print(Node* sentinel){
+    printf("[");
     while (sentinel->next != NULL){
         sentinel = sentinel->next;
-        printf("%c,", sentinel->item);
+        printf("'%c',", sentinel->item);
     }
-    printf("]\n###\n");
+    printf("]\n");
 }
 
-void pstring(const Node* sentinel){
-    printf("###\n");
+void pstring(Node* sentinel){
     while (sentinel->next != NULL){
         sentinel = sentinel->next;
         printf("%c", sentinel->item);
     }
-    printf("\n###\n");
+    printf("\n");
 }
 
+/* Tests */
 void main(){
     Node* sentinel = list();
-    printf("The number of nodes in the list is %lu\n", len(sentinel));
-    printf("Deleting idx 0 succeded?:%d\n", del(sentinel, 0));
 
-    add(sentinel, 'a');
-    add(sentinel, 'b');
-    add(sentinel, 'c');
-    add(sentinel, 'd');
+    add(sentinel, 'h');
+    add(sentinel, 'e');
+    add(sentinel, 'l');
+    add(sentinel, 'l');
+    add(sentinel, 'o');
     print(sentinel);
+
+    replace(sentinel, 4, '0');
     pstring(sentinel);
 
-    printf("The number of nodes in the list is %lu\n", len(sentinel));
-    size_t idx = 3;
-    printf("The item at idx %lu is: %c\n", idx, peak(sentinel, idx));
+    // check that deleting works for a valid index
+    assert(del(sentinel, 4));
+    // and fails when that index becomes invalid.
+    assert(!del(sentinel, 4));
 
-    size_t delindex = 0;
-    printf("Deleting idx %lu succeded?:%d\n", delindex, del(sentinel, delindex));
-    print(sentinel);
+    // check peaking an invalid index returns the sentinel node
+    assert(sentinel == peak(sentinel, 4));
 
-    printf("Deleting idx %lu succeded?:%d\n", delindex, del(sentinel, delindex));
-    print(sentinel);
-
-    printf("Deleting idx %lu succeded?:%d\n", delindex, del(sentinel, delindex));
-    print(sentinel);
-
-    printf("Deleting idx %lu succeded?:%d\n", delindex, del(sentinel, delindex));
-    print(sentinel);
-
+    pstring(sentinel);
     free_list(sentinel);
 }
-
