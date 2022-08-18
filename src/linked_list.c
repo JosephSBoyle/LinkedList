@@ -96,8 +96,9 @@ bool ll_replace(Node* sentinel, size_t idx, char item){
     }
 
 }
-size_t ll_len(Node* sentinel){
-    Node* current_node = sentinel;
+
+size_t ll_len(const Node* sentinel){
+    const Node* current_node = sentinel;
     size_t nodes = 0;
     while (true){
         // Check if we're at the final node.
@@ -109,7 +110,7 @@ size_t ll_len(Node* sentinel){
     }
 }
 
-void ll_print(Node* sentinel){
+void ll_print(const Node* sentinel){
     printf("[");
     while (sentinel->next != NULL){
         sentinel = sentinel->next;
@@ -118,7 +119,7 @@ void ll_print(Node* sentinel){
     printf("]\n");
 }
 
-void ll_stringprint(Node* sentinel){
+void ll_stringprint(const Node* sentinel){
     while (sentinel->next != NULL){
         sentinel = sentinel->next;
         printf("%c", sentinel->item);

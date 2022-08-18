@@ -32,7 +32,7 @@ bool ll_del(Node* sentinel, size_t idx);
 bool ll_replace(Node* sentinel, size_t idx, char item);
 
 /* Get the length of a list */
-size_t ll_len(Node* sentinel);
+size_t ll_len(const Node* sentinel);
 
 /** Peak the idx'th node, or the last node if there are fewer than
  * @returns The node at idx. If no such node exists returns the terminating character: '\0' 
@@ -40,7 +40,7 @@ size_t ll_len(Node* sentinel);
 Node* ll_peek(Node* sentinel, size_t idx);
 
 /* Pretty-print a list */
-void ll_print(Node* sentinel);
+void ll_print(const Node* sentinel);
 
 /* Print a list as a contiguous string */
-void ll_stringprint(Node* sentinel);
+void ll_stringprint(const Node* sentinel);
