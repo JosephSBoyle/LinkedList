@@ -1,10 +1,12 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include "linked_list.h"
-#include <assert.h>
 
-Node* list(){
+struct Node {
+    /* A node in a linked list */
+    char item;  // character at this node
+    Node *next; // pointer to the next node
+};
+
+Node* ll_new(){
     // create a 'sentinel node'.
     Node* sentinel = (Node*)malloc(NODE_SIZE);
     sentinel->next = NULL;
@@ -12,10 +14,10 @@ Node* list(){
     return sentinel;
 }
 
-Node* peak(Node* sentinel, size_t idx){
+Node* ll_peek(Node* sentinel, size_t idx){
     Node* node = sentinel;
 
-    // compare to idx + 1, since we want our peak to be zero-indexed
+    // compare to idx + 1, since we want our peek to be zero-indexed
     // and we have a sentinel node
     for (size_t i=0; i != idx+1; i++){
         if (node->next == NULL){
@@ -27,7 +29,7 @@ Node* peak(Node* sentinel, size_t idx){
     return node;
 }
 
-void free_list(Node* sentinel){
+void ll_free(Node* sentinel){
     // traverse each node in order and free it's memory.
     size_t i = 0;
     do {
@@ -37,10 +39,17 @@ void free_list(Node* sentinel){
     } while (sentinel->next != NULL);
 }
 
-void add(Node* sentinel, char item){
-    // instantiate a new node
-    Node* new_node = (Node*)malloc(NODE_SIZE);
-    new_node->item = item;
+bool ll_add(Node* sentinel, char item){
+    // attempt to allocate space for the new node
+    void* ptr = malloc(NODE_SIZE);
+    if (ptr == NULL){
+        return false;
+    }
+
+    // ptr is not NULL so we can safely cast it to a Node*.
+    Node* new_node = (Node*)ptr;
+    new_node->item = item;  
+    new_node->next = NULL;
 
     // traverse each node
     while (true){
@@ -53,10 +62,11 @@ void add(Node* sentinel, char item){
             sentinel = sentinel->next;
         }
     }
+    return true;
 }
 
-bool del(Node* sentinel, size_t idx){
-    // TODO find a way to leverage peak to simplify this
+bool ll_del(Node* sentinel, size_t idx){
+    // TODO find a way to leverage peek to simplify this
     for (size_t i=0; i != idx; i++){
         if (!sentinel){
             return false;
@@ -68,15 +78,15 @@ bool del(Node* sentinel, size_t idx){
         if (index_node_ptr->next){
             sentinel->next = index_node_ptr->next;
         } else {
-            free(index_node_ptr);
             sentinel->next = NULL;
+            free(index_node_ptr);
         }
         return true;
     }
 }
 
-bool replace(Node* sentinel, size_t idx, char item){
-    Node* node = peak(sentinel, idx);
+bool ll_replace(Node* sentinel, size_t idx, char item){
+    Node* node = ll_peek(sentinel, idx);
     // check if the sentinel and the peaked node are the same
     if (sentinel == node){
         return false;
@@ -86,7 +96,7 @@ bool replace(Node* sentinel, size_t idx, char item){
     }
 
 }
-size_t len(Node* sentinel){
+size_t ll_len(Node* sentinel){
     Node* current_node = sentinel;
     size_t nodes = 0;
     while (true){
@@ -99,7 +109,7 @@ size_t len(Node* sentinel){
     }
 }
 
-void print(Node* sentinel){
+void ll_print(Node* sentinel){
     printf("[");
     while (sentinel->next != NULL){
         sentinel = sentinel->next;
@@ -108,7 +118,7 @@ void print(Node* sentinel){
     printf("]\n");
 }
 
-void pstring(Node* sentinel){
+void ll_stringprint(Node* sentinel){
     while (sentinel->next != NULL){
         sentinel = sentinel->next;
         printf("%c", sentinel->item);
@@ -116,28 +126,3 @@ void pstring(Node* sentinel){
     printf("\n");
 }
 
-/* Tests */
-void main(){
-    Node* sentinel = list();
-
-    add(sentinel, 'h');
-    add(sentinel, 'e');
-    add(sentinel, 'l');
-    add(sentinel, 'l');
-    add(sentinel, 'o');
-    print(sentinel);
-
-    replace(sentinel, 4, '0');
-    pstring(sentinel);
-
-    // check that deleting works for a valid index
-    assert(del(sentinel, 4));
-    // and fails when that index becomes invalid.
-    assert(!del(sentinel, 4));
-
-    // check peaking an invalid index returns the sentinel node
-    assert(sentinel == peak(sentinel, 4));
-
-    pstring(sentinel);
-    free_list(sentinel);
-}

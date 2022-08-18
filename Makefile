@@ -1,2 +1,2 @@
-linked_list: src/linked_list.c src/linked_list.h
-	gcc -o run src/linked_list.c
+linked_list: src/tests.c src/linked_list.c
+	gcc -o run src/tests.c src/linked_list.c

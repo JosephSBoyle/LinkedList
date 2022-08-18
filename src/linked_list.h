@@ -1,43 +1,46 @@
+#pragma once // include this source at most once during compilation.
+
 #include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include "linked_list.h"
 
 // define the node struct here so we can use it within it's own definition
 typedef struct Node Node;
 
-struct Node {
-    /* A node in a linked list */
-    char item;  // character at this node
-    Node *next; // pointer to the next node
-};
-
-size_t NODE_SIZE = sizeof(Node);
+#define NODE_SIZE sizeof(Node)
 
 /* Create a new list */
-Node* list();
+Node* ll_new(void);
 
 /* Destruct a list, freeing it's memory */
-void free_list(Node* sentinel);
+void ll_free(Node* sentinel);
 
-/* Add an element to the end of a list */
-void add(Node* sentinel, char item);
+/** Add an element to the end of a list 
+ * @returns false if an error occured.
+ */
+bool ll_add(Node* sentinel, char item);
 
 /** Delete an element from a list.
  * @returns true if the operation succeeded, false if there is the list is shorter than
  * the supplied index argument.
  */
-bool del(Node* sentinel, size_t idx);
+bool ll_del(Node* sentinel, size_t idx);
 
 /* Replace the value stored by the node at idx. */
-bool replace(Node* sentinel, size_t idx, char item);
+bool ll_replace(Node* sentinel, size_t idx, char item);
 
 /* Get the length of a list */
-size_t len(Node* sentinel);
+size_t ll_len(Node* sentinel);
 
-/* Peak the idx'th node, or the last node if there are fewer than
-   idx elements in the list. */
-Node* peak(Node* sentinel, size_t idx);
+/** Peak the idx'th node, or the last node if there are fewer than
+ * @returns The node at idx. If no such node exists returns the terminating character: '\0' 
+ */
+Node* ll_peek(Node* sentinel, size_t idx);
 
 /* Pretty-print a list */
-void print(Node* sentinel);
+void ll_print(Node* sentinel);
 
 /* Print a list as a contiguous string */
-void pstring(Node* sentinel);
+void ll_stringprint(Node* sentinel);
