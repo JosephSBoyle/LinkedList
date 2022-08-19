@@ -4,14 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "linked_list.h"
 
 // define the node struct here so we can use it within it's own definition
 typedef struct Node Node;
 
 #define NODE_SIZE sizeof(Node)
 
-/* Create a new list */
+/* Create a new list. Exits with code 1 if allocating memory fails. */
 Node* ll_new(void);
 
 /* Destruct a list, freeing it's memory */

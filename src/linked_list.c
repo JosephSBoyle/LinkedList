@@ -8,10 +8,15 @@ struct Node {
 
 Node* ll_new(){
     // create a 'sentinel node'.
-    Node* sentinel = (Node*)malloc(NODE_SIZE);
-    sentinel->next = NULL;
-    sentinel->item = '\0';
-    return sentinel;
+    void* ptr = malloc(NODE_SIZE);
+    if (ptr==NULL){
+        exit(EXIT_FAILURE);
+    } else {
+        Node* sentinel = (Node*)ptr;
+        sentinel->next = NULL;
+        sentinel->item = '\0';
+        return sentinel;
+    }
 }
 
 Node* ll_peek(Node* sentinel, size_t idx){
